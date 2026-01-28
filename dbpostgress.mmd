@@ -1,0 +1,76 @@
+erDiagram
+    %% ---------------------------------------------------------
+    %% GESTION DES UTILISATEURS (Auth)
+    %% ---------------------------------------------------------
+    USERS {
+        int id PK "Identifiant unique"
+        string username "Nom d'utilisateur"
+        string email "Email unique"
+        string password_hash "Mot de passe chiffré"
+        datetime created_at
+    }
+
+    %% ---------------------------------------------------------
+    %% GESTION DES SERVEURS (Communities)
+    %% ---------------------------------------------------------
+    SERVERS {
+        int id PK
+        string name "Nom du serveur"
+        string invitation_code "Code unique pour rejoindre"
+        int owner_id FK "L'utilisateur créateur (Owner)"
+        datetime created_at
+    }
+
+    %% Table de liaison pour gérer les membres et leurs rôles
+    %% Un user peut être dans plusieurs serveurs
+    %% Un serveur a plusieurs users
+    SERVER_MEMBERS {
+        int server_id FK, PK
+        int user_id FK, PK
+        string role "Enum: OWNER, ADMIN, MEMBER"
+        datetime joined_at
+    }
+
+    %% ---------------------------------------------------------
+    %% GESTION DES CANAUX
+    %% ---------------------------------------------------------
+    CHANNELS {
+        int id PK
+        string name "Nom du channel"
+        string type "Ex: text, voice"
+        int server_id FK "Appartient à un serveur"
+        datetime created_at
+    }
+
+    %% ---------------------------------------------------------
+    %% GESTION DES MESSAGES
+    %% ---------------------------------------------------------
+    MESSAGES {
+        int id PK
+        text content "Contenu du message"
+        int channel_id FK "Envoyé dans quel channel"
+        int author_id FK "Qui a écrit le message"
+        boolean is_deleted "Soft delete (pour garder l'historique ou juste cacher)"
+        datetime created_at
+        datetime updated_at
+    }
+
+    %% ---------------------------------------------------------
+    %% RELATIONS
+    %% ---------------------------------------------------------
+
+    %% Un utilisateur peut créer plusieurs serveurs
+    USERS ||--o{ SERVERS : "crée (owner)"
+
+    %% Relation Many-to-Many entre Users et Servers via Server_Members
+    USERS ||--o{ SERVER_MEMBERS : "est membre de"
+    SERVERS ||--o{ SERVER_MEMBERS : "contient"
+
+    %% Un serveur contient plusieurs channels
+    SERVERS ||--o{ CHANNELS : "possède"
+
+    %% Un channel contient plusieurs messages
+    CHANNELS ||--o{ MESSAGES : "contient"
+
+    %% Un message est écrit par un utilisateur
+    USERS ||--o{ MESSAGES : "écrit"
