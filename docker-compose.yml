@@ -1,0 +1,56 @@
+services:
+  # ---------------------------------------------------------
+  # SERVICE BASE DE DONNÉES (PostgreSQL)
+  # ---------------------------------------------------------
+  db:
+    image: postgres:15-alpine
+    container_name: irc_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: chat_db
+    ports:
+      - "5432:5432" # Permet d'accéder à la BDD depuis ton PC (DBeaver, etc.)
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Optionnel : Lancer le script SQL automatiquement au premier démarrage
+      - ./server/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  # ---------------------------------------------------------
+  # SERVICE BACKEND (Rust)
+  # ---------------------------------------------------------
+  server:
+    build: ./server
+    container_name: irc_backend
+    ports:
+      - "4000:4000" # API REST & Socket.IO (Déplacé pour laisser 3000 au front)
+    environment:
+      - DATABASE_URL=postgresql://admin:password123@db:5432/chat_db
+      - PORT=4000
+      - RUST_LOG=debug
+    depends_on:
+      - db
+    volumes:
+      - ./server:/app
+      # Cache pour éviter de retélécharger/recompiler les dépendances à chaque fois
+      - cargo_registry:/usr/local/cargo/registry
+      - cargo_target:/app/target
+
+  # ---------------------------------------------------------
+  # SERVICE FRONTEND (React/Vue...)
+  # ---------------------------------------------------------
+  client:
+    build: ./client
+    container_name: irc_frontend
+    ports:
+      - "3000:3000" # Next.js par défaut
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+      - /app/.next
+
+volumes:
+  postgres_data:
+  cargo_registry:
+  cargo_target:
