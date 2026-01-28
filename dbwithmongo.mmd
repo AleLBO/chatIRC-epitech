@@ -1,0 +1,47 @@
+erDiagram
+    subgraph "SQL Database (PostgreSQL)"
+        USERS {
+            int id PK
+            string username
+            string email
+            string password_hash
+        }
+
+        SERVERS {
+            int id PK
+            string name
+            int owner_id FK
+        }
+
+        SERVER_MEMBERS {
+            int server_id FK, PK
+            int user_id FK, PK
+            string role
+        }
+
+        CHANNELS {
+            int id PK
+            string name
+            int server_id FK
+        }
+
+        USERS ||--o{ SERVERS : "owns"
+        USERS ||--o{ SERVER_MEMBERS : "is_member_of"
+        SERVERS ||--o{ SERVER_MEMBERS : "has_member"
+        SERVERS ||--o{ CHANNELS : "has"
+    end
+
+    subgraph "NoSQL Database (MongoDB)"
+        MESSAGES {
+            ObjectId _id PK
+            int channel_id "Refers to CHANNELS.id in SQL"
+            int author_id "Refers to USERS.id in SQL"
+            json content "Flexible content (text, etc.)"
+            array attachments
+            datetime timestamp
+        }
+    end
+
+    %% La relation est logique, pas physique (gérée par l'application)
+    CHANNELS ||--o{ MESSAGES : "contains (logical link)"
+    USERS ||--o{ MESSAGES : "writes (logical link)"
