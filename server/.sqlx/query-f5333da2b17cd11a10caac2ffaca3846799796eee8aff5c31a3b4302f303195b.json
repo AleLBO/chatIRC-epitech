@@ -1,0 +1,66 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT m.id, m.content, m.channel_id, m.author_id, m.created_at, m.is_deleted, m.updated_at, u.username as author_username FROM messages m INNER JOIN users u ON m.author_id = u.id WHERE m.channel_id = $1 AND m.is_deleted = false ORDER BY m.created_at DESC LIMIT $2 OFFSET $3",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "content",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "channel_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "author_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "is_deleted",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 6,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 7,
+        "name": "author_username",
+        "type_info": "Varchar"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "f5333da2b17cd11a10caac2ffaca3846799796eee8aff5c31a3b4302f303195b"
+}

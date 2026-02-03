@@ -3,28 +3,50 @@ name = "server"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 # --- Core Web & Async ---
-# Le framework web pour construire l'API REST
-axum = "0.7"
-# Le runtime asynchrone, nécessaire pour Axum, SQLx et Socketioxide
+axum = { version = "0.7", features = ["ws"] }
+axum-extra = { version = "0.9", features = ["typed-header"] }
 tokio = { version = "1", features = ["full"] }
 
 # --- Socket.IO ---
-# Implémentation du protocole Socket.IO, compatible avec le client JS
-socketioxide = { version = "0.11", features = ["macros"] }
+socketioxide = { version = "0.14", features = [] }
 
 # --- Base de données (PostgreSQL) ---
-# Pour interagir avec la base de données de manière asynchrone et sécurisée
-sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "postgres", "macros", "chrono"] }
+sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "postgres", "macros", "chrono", "uuid"] }
 
 # --- Sérialisation & Données ---
-# Le standard pour la sérialisation/désérialisation (JSON, etc.)
 serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# --- Gestion des erreurs ---
+thiserror = "1.0"
+anyhow = "1.0"
+
+# --- UUIDs ---
+uuid = { version = "1.6", features = ["v4", "serde"] }
+
+# --- Dates et heures ---
+chrono = { version = "0.4", features = ["serde"] }
+
+# --- Pour les traits async ---
+async-trait = "0.1"
+
+# --- Variables d'environnement ---
+dotenvy = "0.15"
+
+# --- Hashage de mot de passe ---
+bcrypt = "0.15"
+
+# --- JWT pour l'authentification ---
+jsonwebtoken = "9"
+
+# --- CORS pour le frontend ---
+tower-http = { version = "0.5", features = ["cors"] }
+
+# --- Génération aléatoire ---
+rand = "0.8"
 
 # --- Utilitaires ---
-# Pour le logging et le debug, très utile avec Axum
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }

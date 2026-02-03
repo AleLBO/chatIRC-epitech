@@ -7,9 +7,9 @@ services:
     container_name: irc_postgres
     restart: always
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password123
-      POSTGRES_DB: chat_db
+      POSTGRES_USER: chatadmin
+      POSTGRES_PASSWORD: chatpassword
+      POSTGRES_DB: chatdb
     ports:
       - "5432:5432" # Permet d'accéder à la BDD depuis ton PC (DBeaver, etc.)
     volumes:
@@ -26,7 +26,7 @@ services:
     ports:
       - "4000:4000" # API REST & Socket.IO (Déplacé pour laisser 3000 au front)
     environment:
-      - DATABASE_URL=postgresql://admin:password123@db:5432/chat_db
+      - DATABASE_URL=postgresql://chatadmin:chatpassword@db:5432/chatdb
       - PORT=4000
       - RUST_LOG=debug
     depends_on:
@@ -44,7 +44,7 @@ services:
     build: ./client
     container_name: irc_frontend
     ports:
-      - "3000:3000" # Next.js par défaut
+      - "3001:3000" # Next.js par défaut
     volumes:
       - ./client:/app
       - /app/node_modules
