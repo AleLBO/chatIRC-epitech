@@ -157,7 +157,8 @@ Toutes les dépendances sont :
 ```
 ✅ POST   /auth/signup          Create account
 ✅ POST   /auth/login           Login
-✅ GET    /auth/me              Get current user (JWT required)
+✅ GET    /auth/me
+   POST   /auth/logout           Get current user (JWT required)
 ```
 
 ### Servers (9)

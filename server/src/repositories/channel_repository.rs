@@ -30,11 +30,7 @@ impl ChannelRepositoryTrait for ChannelRepository {
     async fn create(&self, name: &str, channel_type: &str, server_id: i32) -> AppResult<Channel> {
         let channel = sqlx::query_as!(
             Channel,
-            r#"
-            INSERT INTO channels (name, type, server_id)
-            VALUES ($1, $2, $3)
-            RETURNING id, name, type as channel_type, server_id, created_at
-            "#,
+            "INSERT INTO channels (name, type, server_id) VALUES ($1, $2, $3) RETURNING id, name, type, server_id, created_at",
             name,
             channel_type,
             server_id
@@ -48,7 +44,7 @@ impl ChannelRepositoryTrait for ChannelRepository {
     async fn find_by_id(&self, id: i32) -> AppResult<Option<Channel>> {
         let channel = sqlx::query_as!(
             Channel,
-            "SELECT id, name, type as channel_type, server_id, created_at FROM channels WHERE id = $1",
+            "SELECT id, name, type, server_id, created_at FROM channels WHERE id = $1",
             id
         )
         .fetch_optional(&self.pool)
@@ -60,7 +56,7 @@ impl ChannelRepositoryTrait for ChannelRepository {
     async fn find_by_server(&self, server_id: i32) -> AppResult<Vec<Channel>> {
         let channels = sqlx::query_as!(
             Channel,
-            "SELECT id, name, type as channel_type, server_id, created_at FROM channels WHERE server_id = $1 ORDER BY created_at",
+            "SELECT id, name, type, server_id, created_at FROM channels WHERE server_id = $1",
             server_id
         )
         .fetch_all(&self.pool)
@@ -72,7 +68,7 @@ impl ChannelRepositoryTrait for ChannelRepository {
     async fn update(&self, id: i32, name: &str) -> AppResult<Channel> {
         let channel = sqlx::query_as!(
             Channel,
-            "UPDATE channels SET name = $1 WHERE id = $2 RETURNING id, name, type as channel_type, server_id, created_at",
+            "UPDATE channels SET name = $1 WHERE id = $2 RETURNING id, name, type, server_id, created_at",
             name,
             id
         )

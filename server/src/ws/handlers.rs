@@ -209,3 +209,4 @@ pub async fn on_disconnect(socket: SocketRef, hub: Arc<Hub>) {
     // Note: Dans une vraie application, il faudrait tracker tous les serveurs
     // où l'utilisateur était connecté pour notifier correctement
 }
+

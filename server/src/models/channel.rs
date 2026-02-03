@@ -8,7 +8,8 @@ pub struct Channel {
     pub id: i32,
     pub name: String,
     #[sqlx(rename = "type")]
-    pub channel_type: String,
+    #[serde(rename = "type")]
+    pub r#type: String,
     pub server_id: i32,
     pub created_at: DateTime<Utc>,
 }
@@ -17,8 +18,8 @@ pub struct Channel {
 #[derive(Debug, Deserialize)]
 pub struct CreateChannelDto {
     pub name: String,
-    #[serde(default = "default_channel_type")]
-    pub channel_type: String,
+    #[serde(default = "default_channel_type", rename = "type")]
+    pub r#type: String,
 }
 
 fn default_channel_type() -> String {

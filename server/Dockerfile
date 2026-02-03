@@ -5,6 +5,8 @@ WORKDIR /app
 
 # Installation de cargo-watch pour le hot-reloading en développement
 RUN cargo install cargo-watch
+RUN cargo install sqlx-cli --no-default-features --features postgres
+
 
 # Copie des fichiers
 COPY . .

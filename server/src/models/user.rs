@@ -33,6 +33,7 @@ pub struct CreateUserDto {
 /// DTO pour la connexion
 #[derive(Debug, Deserialize)]
 pub struct LoginDto {
+    #[serde(alias = "email")]
     pub username: String,
     pub password: String,
 }
@@ -42,4 +43,12 @@ pub struct LoginDto {
 pub struct AuthResponse {
     pub user: User,
     pub token: String,
+}
+
+/// DTO pour la mise à jour d'un utilisateur
+#[derive(Debug, Deserialize)]
+pub struct UpdateUserDto {
+    pub username: Option<String>,
+    pub email: Option<String>,
+    pub password: Option<String>,
 }

@@ -34,7 +34,7 @@ pub struct ServerMember {
 }
 
 /// Détails complets d'un membre (utilisateur + rôle)
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
 pub struct ServerMemberDetails {
     pub user_id: i32,
     pub username: String,

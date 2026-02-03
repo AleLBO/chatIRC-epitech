@@ -1,5 +1,19 @@
--- Création du type ENUM pour les rôles
-CREATE TYPE user_role AS ENUM ('OWNER', 'ADMIN', 'MEMBER');
+-- ==============================================
+-- Migration initiale : création du schéma de base
+-- ==============================================
+
+-- Créer le type ENUM “user_role” seulement s'il n'existe pas
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_type
+        WHERE typname = 'user_role'
+    ) THEN
+        CREATE TYPE user_role AS ENUM ('OWNER', 'ADMIN', 'MEMBER');
+    END IF;
+END
+$$;
 
 -- Table des Utilisateurs
 CREATE TABLE IF NOT EXISTS users (
@@ -55,9 +69,9 @@ CREATE TABLE IF NOT EXISTS messages (
 );
 
 -- Index pour améliorer les performances
-CREATE INDEX idx_server_members_user_id ON server_members(user_id);
-CREATE INDEX idx_server_members_server_id ON server_members(server_id);
-CREATE INDEX idx_channels_server_id ON channels(server_id);
-CREATE INDEX idx_messages_channel_id ON messages(channel_id);
-CREATE INDEX idx_messages_author_id ON messages(author_id);
-CREATE INDEX idx_messages_created_at ON messages(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_server_members_user_id ON server_members(user_id);
+CREATE INDEX IF NOT EXISTS idx_server_members_server_id ON server_members(server_id);
+CREATE INDEX IF NOT EXISTS idx_channels_server_id ON channels(server_id);
+CREATE INDEX IF NOT EXISTS idx_messages_channel_id ON messages(channel_id);
+CREATE INDEX IF NOT EXISTS idx_messages_author_id ON messages(author_id);
+CREATE INDEX IF NOT EXISTS idx_messages_created_at ON messages(created_at DESC);

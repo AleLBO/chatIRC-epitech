@@ -1,10 +1,9 @@
 use std::sync::Arc;
 use crate::errors::{AppError, AppResult};
-use crate::models::{User, CreateUserDto, LoginDto, AuthResponse};
+use crate::models::{User, CreateUserDto, LoginDto, AuthResponse, UpdateUserDto};
 use crate::repositories::user_repository::{UserRepository, UserRepositoryTrait};
 use crate::utils::{hash_password, verify_password, create_token};
 
-/// Service gérant l'authentification
 #[derive(Clone)]
 pub struct AuthService {
     user_repo: Arc<UserRepository>,
@@ -15,63 +14,87 @@ impl AuthService {
         Self { user_repo }
     }
 
-    /// Inscription d'un nouvel utilisateur
     pub async fn register(&self, dto: CreateUserDto) -> AppResult<AuthResponse> {
-        // Vérifier si l'username existe déjà
         if self.user_repo.find_by_username(&dto.username).await?.is_some() {
             return Err(AppError::UsernameTaken);
         }
 
-        // Vérifier si l'email existe déjà
         if self.user_repo.find_by_email(&dto.email).await?.is_some() {
             return Err(AppError::EmailTaken);
         }
 
-        // Valider le mot de passe (au moins 6 caractères)
         if dto.password.len() < 6 {
             return Err(AppError::ValidationError(
                 "Le mot de passe doit contenir au moins 6 caractères".to_string(),
             ));
         }
 
-        // Hasher le mot de passe
         let password_hash = hash_password(&dto.password)?;
-
-        // Créer l'utilisateur
         let user = self.user_repo.create(dto, &password_hash).await?;
-
-        // Générer un token JWT
         let token = create_token(user.id, &user.username)?;
+        tracing::info!("✅ Inscription réussie - Nouvel utilisateur: {} (ID: {})", user.username, user.id);
 
         Ok(AuthResponse { user, token })
     }
 
-    /// Connexion d'un utilisateur
     pub async fn login(&self, dto: LoginDto) -> AppResult<AuthResponse> {
-        // Trouver l'utilisateur par username
-        let user = self
-            .user_repo
-            .find_by_username(&dto.username)
-            .await?
-            .ok_or(AppError::InvalidCredentials)?;
+        // Essayer de trouver l'utilisateur par username d'abord, puis par email
+        let user = match self.user_repo.find_by_username(&dto.username).await? {
+            Some(user) => user,
+            None => self.user_repo
+                .find_by_email(&dto.username)
+                .await?
+                .ok_or(AppError::InvalidCredentials)?,
+        };
 
-        // Vérifier le mot de passe
         let is_valid = verify_password(&dto.password, &user.password_hash)?;
         if !is_valid {
             return Err(AppError::InvalidCredentials);
         }
 
-        // Générer un token JWT
         let token = create_token(user.id, &user.username)?;
-
+        tracing::info!("✅ Connexion réussie - Utilisateur: {} (ID: {})", user.username, user.id);
         Ok(AuthResponse { user, token })
     }
 
-    /// Récupérer l'utilisateur actuel par son ID
     pub async fn get_current_user(&self, user_id: i32) -> AppResult<User> {
         self.user_repo
             .find_by_id(user_id)
             .await?
             .ok_or(AppError::UserNotFound)
+    }
+
+    // --------- Update ---------
+    pub async fn update_user(
+        &self,
+        user_id: i32,
+        dto: UpdateUserDto,
+    ) -> AppResult<User> {
+        let user = self.user_repo.find_by_id(user_id).await?
+            .ok_or(AppError::UserNotFound)?;
+
+        let username = dto.username.unwrap_or(user.username);
+        let email = dto.email.unwrap_or(user.email);
+
+        if let Some(_) = self.user_repo.find_by_username(&username).await? {
+            return Err(AppError::UsernameTaken);
+        }
+        if let Some(_) = self.user_repo.find_by_email(&email).await? {
+            return Err(AppError::EmailTaken);
+        }
+
+        let password_hash = if let Some(pwd) = &dto.password {
+            hash_password(pwd)?
+        } else {
+            user.password_hash.clone()
+        };
+
+        self.user_repo.update(user_id, &username, &email, &password_hash).await
+    }
+
+    // --------- Delete ---------
+    pub async fn delete_user(&self, user_id: i32) -> AppResult<()> {
+        self.user_repo.delete(user_id).await?;
+        Ok(())
     }
 }

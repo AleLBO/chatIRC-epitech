@@ -1,0 +1,47 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE servers SET name = $1 WHERE id = $2 RETURNING id, name, owner_id, invitation_code, created_at",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "name",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 2,
+        "name": "owner_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "invitation_code",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 4,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Varchar",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "d39bc77bc2a4b94b2e43b9e21a40e1e932a2647a32bc29edaa6cfd7783fdd294"
+}

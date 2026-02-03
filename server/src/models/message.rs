@@ -21,7 +21,7 @@ pub struct CreateMessageDto {
 }
 
 /// Message avec les détails de l'auteur
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, FromRow)]
 pub struct MessageWithAuthor {
     pub id: i32,
     pub content: String,

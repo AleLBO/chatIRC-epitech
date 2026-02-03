@@ -30,11 +30,7 @@ impl MessageRepositoryTrait for MessageRepository {
     async fn create(&self, content: &str, channel_id: i32, author_id: i32) -> AppResult<Message> {
         let message = sqlx::query_as!(
             Message,
-            r#"
-            INSERT INTO messages (content, channel_id, author_id)
-            VALUES ($1, $2, $3)
-            RETURNING id, content, channel_id, author_id, is_deleted, created_at, updated_at
-            "#,
+            "INSERT INTO messages (content, channel_id, author_id) VALUES ($1, $2, $3) RETURNING id, content, channel_id, author_id, created_at, updated_at, is_deleted",
             content,
             channel_id,
             author_id
@@ -48,7 +44,7 @@ impl MessageRepositoryTrait for MessageRepository {
     async fn find_by_id(&self, id: i32) -> AppResult<Option<Message>> {
         let message = sqlx::query_as!(
             Message,
-            "SELECT id, content, channel_id, author_id, is_deleted, created_at, updated_at FROM messages WHERE id = $1",
+            "SELECT id, content, channel_id, author_id, created_at, updated_at, is_deleted FROM messages WHERE id = $1",
             id
         )
         .fetch_optional(&self.pool)
@@ -60,22 +56,7 @@ impl MessageRepositoryTrait for MessageRepository {
     async fn find_by_channel(&self, channel_id: i32, limit: i64, offset: i64) -> AppResult<Vec<MessageWithAuthor>> {
         let messages = sqlx::query_as!(
             MessageWithAuthor,
-            r#"
-            SELECT 
-                m.id, 
-                m.content, 
-                m.channel_id, 
-                m.author_id, 
-                u.username as author_username,
-                m.is_deleted, 
-                m.created_at, 
-                m.updated_at
-            FROM messages m
-            INNER JOIN users u ON m.author_id = u.id
-            WHERE m.channel_id = $1
-            ORDER BY m.created_at DESC
-            LIMIT $2 OFFSET $3
-            "#,
+            "SELECT m.id, m.content, m.channel_id, m.author_id, m.created_at, m.is_deleted, m.updated_at, u.username as author_username FROM messages m INNER JOIN users u ON m.author_id = u.id WHERE m.channel_id = $1 AND m.is_deleted = false ORDER BY m.created_at DESC LIMIT $2 OFFSET $3",
             channel_id,
             limit,
             offset

@@ -120,6 +120,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/auth/signup", post(handlers::signup))
         .route("/auth/login", post(handlers::login))
         .route("/auth/me", get(handlers::get_me))
+
+       
+        
         
         // Routes des serveurs
         .route("/servers", post(handlers::create_server))

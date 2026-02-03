@@ -1,0 +1,60 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO messages (content, channel_id, author_id) VALUES ($1, $2, $3) RETURNING id, content, channel_id, author_id, created_at, updated_at, is_deleted",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "content",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "channel_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "author_id",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 4,
+        "name": "created_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 5,
+        "name": "updated_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 6,
+        "name": "is_deleted",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Int4",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "a72bd1de7584c58391868e46e3eecbe0f415cfe9b7977c1ba8ed68acb23c56dc"
+}

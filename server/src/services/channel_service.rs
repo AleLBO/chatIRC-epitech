@@ -34,7 +34,7 @@ impl ChannelService {
         }
 
         self.channel_repo
-            .create(&dto.name, &dto.channel_type, server_id)
+            .create(&dto.name, &dto.r#type, server_id)
             .await
     }
 
